@@ -1,0 +1,865 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset=utf8><meta name="robots" content="noindex,nofollow"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="הקופה"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>קופת מיכאלה ועידן</title><meta name="claude:viewport-fit-sides" content="cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Assistant:wght@400;600;700;800&display=swap"><style id="app-style">
+/* Layout: one phone-width column. A coin jar anchors each kid's screen (my money / parents' match / growth), then the portfolio split by asset class, then the ledger. Parent desk sits behind a PIN and saves by republishing the page. */
+:root{
+  --bg:#EDF2F5; --surface:#FFFFFF; --sunk:#E2E9EE; --ink:#15202A; --muted:#566573; --line:#D3DCE3;
+  --gold:#CF9200; --gold-soft:#FBEAC0; --leaf:#1F9356; --leaf-soft:#D2EFDE; --loss:#C53A50; --loss-soft:#F8DCE1;
+  --c-cash:#8796A6; --c-index:#16917F; --c-stock:#E8742A; --c-bond:#7656C2;
+  --kid:#E0507A;
+  --kid-soft:color-mix(in srgb, var(--kid) 16%, var(--surface));
+  --kid-ink:color-mix(in srgb, var(--kid) 78%, var(--ink));
+  --f-display:"Fredoka","Assistant","Arial Hebrew",system-ui,sans-serif;
+  --f-body:"Assistant","Arial Hebrew","Segoe UI",system-ui,sans-serif;
+  --r:20px; --r-sm:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E141A; --surface:#17202A; --sunk:#1F2A35; --ink:#E7EDF2; --muted:#93A3B1; --line:#2A3743;
+  --gold:#F0B935; --gold-soft:#3A3014; --leaf:#4DC380; --leaf-soft:#173527; --loss:#F06C80; --loss-soft:#3D1E25;
+  --c-cash:#A3B1BF; --c-index:#3CC2AD; --c-stock:#F59A55; --c-bond:#A68AE6;
+  --kid-ink:color-mix(in srgb, var(--kid) 70%, #ffffff); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0E141A; --surface:#17202A; --sunk:#1F2A35; --ink:#E7EDF2; --muted:#93A3B1; --line:#2A3743;
+  --gold:#F0B935; --gold-soft:#3A3014; --leaf:#4DC380; --leaf-soft:#173527; --loss:#F06C80; --loss-soft:#3D1E25;
+  --c-cash:#A3B1BF; --c-index:#3CC2AD; --c-stock:#F59A55; --c-bond:#A68AE6;
+  --kid-ink:color-mix(in srgb, var(--kid) 70%, #ffffff); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;direction:rtl;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 40px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--bg)}
+.app{max-width:600px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;margin:0;text-wrap:balance;line-height:1.2}
+h2{font-size:1.25rem}
+.num{font-variant-numeric:tabular-nums;unicode-bidi:isolate;direction:ltr;display:inline-block}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--kid);outline-offset:2px}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.home-title{font-family:var(--f-display);font-weight:600;font-size:2rem;padding-block:28px 6px}
+
+.top{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--bg);display:flex;align-items:center;gap:12px;padding-block:14px 10px}
+.top .who{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--kid-soft);border:2px solid var(--kid);flex:none}
+.top h1{font-size:1.4rem}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:600;font-size:.9rem;display:inline-flex;gap:6px;align-items:center}
+.iconbtn:hover{border-color:var(--kid)}
+
+.stack{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card h2{margin-bottom:12px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.spread{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+
+.kids{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kidcard{border:2px solid var(--line);background:var(--surface);border-radius:24px;padding:24px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .15s,border-color .15s}
+.kidcard:hover{transform:translateY(-2px);border-color:var(--kid)}
+.kidcard .avatar{width:84px;height:84px;font-size:50px}
+.kidcard b{font-family:var(--f-display);font-size:1.35rem;font-weight:600}
+.parentlink{margin-top:22px;display:flex;justify-content:center}
+
+.hero{background:var(--kid-soft);border-color:color-mix(in srgb,var(--kid) 35%,transparent);display:grid;grid-template-columns:1fr 128px;gap:14px;align-items:center}
+.hero .label{font-weight:700;color:var(--kid-ink);font-size:.95rem}
+.hero .big{font-family:var(--f-display);font-size:clamp(2.4rem,9vw,3.3rem);font-weight:700;line-height:1.05;margin:4px 0 8px}
+.legend{display:flex;flex-direction:column;gap:6px;font-size:.95rem}
+.dot{width:12px;height:12px;border-radius:4px;display:inline-block;margin-inline-end:6px;vertical-align:-1px;flex:none}
+.legend .li{display:flex;justify-content:space-between;gap:10px}
+.goal{grid-column:1/-1;font-size:.92rem;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:color-mix(in srgb,var(--kid) 20%,var(--surface));overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--kid);border-radius:99px}
+.jar{width:128px;height:auto}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:99px;font-weight:700;font-size:.85rem}
+.up{background:var(--leaf-soft);color:var(--leaf)} .down{background:var(--loss-soft);color:var(--loss)} .flat{background:var(--sunk);color:var(--muted)}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--sunk);border-radius:var(--r-sm);padding:10px 12px}
+.stat small{display:block;color:var(--muted);font-weight:600;font-size:.8rem}
+.stat b{font-family:var(--f-display);font-size:1.2rem;font-weight:600}
+
+/* allocation */
+.alloc{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center}
+.alloc svg{width:150px;height:auto;display:block}
+.aleg{display:flex;flex-direction:column;gap:8px}
+.aleg .li{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center}
+.aleg .li.zero{opacity:.45}
+.aleg .p{font-weight:700;min-width:3.4em;text-align:left}
+.aleg .v{color:var(--muted);min-width:4.5em;text-align:left}
+.stackbar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--sunk)}
+.stackbar i{display:block;height:100%}
+
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:10px}
+.m{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.7rem;color:var(--muted)}
+.m i{width:100%;aspect-ratio:1;max-width:30px;border-radius:50%;border:2px dashed var(--line);display:block}
+.m.on i{background:var(--kid);border:2px solid var(--kid)}
+.m.now i{border-color:var(--kid)}
+.streakbig{font-family:var(--f-display);font-size:2.2rem;font-weight:700;color:var(--kid-ink);line-height:1}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.badge{border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:.85rem;font-weight:600;color:var(--muted);opacity:.55}
+.badge.got{opacity:1;color:var(--ink);border-color:var(--gold);background:var(--gold-soft)}
+
+.group{margin-top:14px}
+.group:first-of-type{margin-top:0}
+.ghead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:6px;border-bottom:2px solid var(--gc,var(--line))}
+.ghead h3{font-size:1.05rem;display:flex;align-items:center}
+.ghead b{font-family:var(--f-display);font-weight:600}
+.hold{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;border-top:1px solid var(--line)}
+.ghead + .hold{border-top:0}
+.hold .sym{font-family:var(--f-display);font-weight:600;font-size:1.1rem}
+.hold .val{font-family:var(--f-display);font-weight:600;font-size:1.1rem;text-align:left}
+.split{grid-column:1/-1;height:6px;border-radius:99px;overflow:hidden;display:flex;background:var(--sunk);margin-top:6px}
+.split i{display:block;height:100%}
+
+.tx{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.tx:first-of-type{border-top:0}
+.tx .d{background:var(--sunk);border-radius:12px;text-align:center;padding:6px 0;line-height:1.1;align-self:start}
+.tx .d b{font-family:var(--f-display);font-size:1.3rem;display:block}
+.tx .d small{font-size:.72rem;color:var(--muted)}
+.tx .t{font-weight:700}
+.tx .parts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;font-size:.9rem}
+.tag{border-radius:8px;padding:1px 8px;font-weight:600}
+.tag.kid{background:var(--kid-soft);color:var(--kid-ink)} .tag.par{background:var(--gold-soft);color:color-mix(in srgb,var(--gold) 70%,var(--ink))} .tag.neu{background:var(--sunk);color:var(--muted)}
+
+.chartwrap{direction:ltr;margin-top:6px}
+.chartwrap svg{width:100%;height:auto;display:block}
+.chartlegend{display:flex;gap:16px;font-size:.85rem;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+
+.tip{background:var(--gold-soft);border-color:color-mix(in srgb,var(--gold) 40%,transparent)}
+.tip p{margin:0;font-size:1.05rem;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--kid)}
+.proj-big{font-family:var(--f-display);font-size:2rem;font-weight:700;color:var(--kid-ink)}
+.empty{border:2px dashed var(--line);border-radius:var(--r);padding:20px;text-align:center;color:var(--muted)}
+
+label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:.9rem;min-width:0}
+label.check{flex-direction:row;align-items:center;gap:10px;font-size:1rem}
+label.check input{width:22px;height:22px;accent-color:var(--ink)}
+input,select{font:inherit;font-weight:400;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+input[type=number],input[type=date]{direction:ltr;text-align:right}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+fieldset{border:1px solid var(--line);border-radius:14px;padding:14px;margin:0;display:flex;flex-direction:column;gap:12px;min-width:0}
+legend{font-weight:700;padding:0 6px}
+.seg{display:flex;background:var(--sunk);border-radius:12px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:9px 10px;font-weight:700;color:var(--muted);min-width:max-content}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgb(0 0 0 / .12)}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:800;background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:var(--loss);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.preview{background:var(--sunk);border-radius:12px;padding:12px;font-size:.95rem;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.tabs button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 14px;font-weight:700;white-space:nowrap;color:var(--muted)}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:right;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--muted);font-weight:700;font-size:.8rem}
+td input{padding:6px 8px;width:110px}
+.src{font-size:.75rem;font-weight:700;border-radius:99px;padding:1px 8px;background:var(--sunk);color:var(--muted)}
+.src.auto{background:var(--leaf-soft);color:var(--leaf)}
+
+.overlay{position:fixed;inset:0;background:rgb(10 15 20 / .55);z-index:20;display:grid;place-items:center;padding:16px}
+.sheet{background:var(--surface);border-radius:24px;padding:22px;width:min(360px,100%);max-height:90vh;overflow:auto}
+.dots{display:flex;justify-content:center;gap:14px;margin:16px 0 20px;direction:ltr}
+.dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink)}
+.dots i.f{background:var(--ink)}
+.dots.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;direction:ltr}
+.pad button{border:1px solid var(--line);background:var(--sunk);border-radius:16px;padding:14px 0;font-family:var(--f-display);font-size:1.5rem;font-weight:600}
+.picker{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 16px}
+.picker button{width:52px;height:52px;border-radius:14px;border:2px solid var(--line);background:var(--sunk);font-size:28px}
+.picker button[aria-pressed="true"]{border-color:var(--ink)}
+.picker .swatch{width:40px;height:40px;border-radius:50%}
+
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;z-index:30;max-width:90vw;text-align:center}
+.notice{background:var(--loss-soft);color:var(--loss);border-radius:12px;padding:10px 14px;font-weight:600;font-size:.92rem;margin:0}
+.info{background:var(--sunk);border-radius:12px;padding:10px 14px;font-size:.92rem;margin:0}
+.foot{text-align:center;color:var(--muted);font-size:.8rem;margin-top:22px}
+
+@media (max-width:440px){
+  .hero{grid-template-columns:1fr 96px}
+  .jar{width:96px}
+  .stats{grid-template-columns:1fr 1fr}
+  .stats .stat:last-child{grid-column:1/-1}
+  .grid2{grid-template-columns:1fr}
+  .alloc{grid-template-columns:1fr;justify-items:center}
+  .aleg{width:100%}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style><div class="app" id="app" dir="rtl" lang="he"><div class="home-title">טוען את הקופה…</div></div><div id="layer"></div><script id="state" type="application/json">{}</script><script>window.KIDS_PUBLIC=true</script><script id="app-script">
+(function(){
+document.documentElement.lang='he';
+
+/* ===== page template (the page re-publishes itself from this when a parent saves) ===== */
+const RESET=':root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}';
+const HEAD='<title>קופת מיכאלה ועידן</title><meta name="claude:viewport-fit-sides" content="cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Assistant:wght@400;600;700;800&display=swap">';
+const SHELL='<div class="app" id="app" dir="rtl" lang="he"><div class="home-title">טוען את הקופה…</div></div><div id="layer"></div>';
+function pageHTML(state){
+  const SC='script';
+  const css=document.getElementById('app-style').textContent;
+  const js=document.getElementById('app-script').textContent;
+  const json=JSON.stringify(state).replace(/</g,'\\u003c');
+  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'
+    +HEAD+'<style id="app-style">'+css+'</style>'+SHELL
+    +'<'+SC+' id="state" type="application/json">'+json+'</'+SC+'>'
+    +'<'+SC+' id="app-script">'+js+'</'+SC+'>'
+    +'</body></html>';
+}
+
+/* ===== constants ===== */
+const KIDS={
+  michaela:{id:'michaela',name:'מיכאלה',g:'f',color:'#E0507A',emoji:'🦊'},
+  idan:{id:'idan',name:'עידן',g:'m',color:'#2A86C0',emoji:'🐬'}
+};
+const ANIMALS=['🦊','🐬','🦁','🐼','🐯','🦉','🐢','🐙','🦄','🐨','🐸','🐝'];
+const COLORS=['#E0507A','#2A86C0','#EE7B2F','#1E9C8A','#8E5BC8','#3D5A80'];
+const CLASSES=[['cash','מזומן'],['index','מדדים'],['stock','מניות'],['bond','אג"ח']];
+const TYPE1={index:'מדד',stock:'מניה',bond:'אג"ח'};
+const MONTHS=['ינו׳','פבר׳','מרץ','אפר׳','מאי','יוני','יולי','אוג׳','ספט׳','אוק׳','נוב׳','דצמ׳'];
+const MILESTONES=[100,250,500,1000,2500,5000,10000,25000,50000,100000,250000];
+const TIPS=[
+  'מדד זה סל עם הרבה חברות ביחד. אם חברה אחת נופלת, כל האחרות ממשיכות להחזיק את הסל.',
+  'מניה היא חתיכה קטנה מחברה אמיתית. כשהחברה מצליחה, גם החתיכה שלך שווה יותר.',
+  'אג"ח זה כמו להלוות כסף ולקבל אותו בחזרה עם תוספת קטנה. רגוע יותר, וגדל לאט יותר.',
+  'מזומן בקופה זה כסף שעוד לא קנינו בו כלום. הוא לא יורד, אבל גם לא גדל.',
+  'ירידות קורות לכולם. מי שממשיך להפקיד בזמן ירידה קונה יותר יחידות באותו סכום.',
+  'כל שקל שלך הופך לשניים: ההורים מוסיפים בדיוק אותו סכום.',
+  'הסוד הגדול הוא זמן. הרווח מתחיל להרוויח בעצמו, וזה נקרא ריבית דריבית.',
+  'לא צריך לבדוק כל יום. מספיק להסתכל פעם בחודש, ביום ההפקדה.',
+  'אף אחד לא יודע מה יקרה מחר בבורסה, גם לא מבוגרים ולא מומחים. לכן משקיעים לאורך הרבה שנים.',
+  'לפזר את הכסף בין כמה סוגים של השקעות זה כמו לא לשים את כל הביצים בסל אחד.',
+  'רווח על הנייר הוא עוד לא כסף אמיתי. רק כשמוכרים, הרווח מתממש, ואז משלמים עליו מס למדינה.'
+];
+
+/* ===== state ===== */
+/* PUBLIC = the kids' read-only copy hosted outside Claude; it loads its numbers from data.json next to it. */
+const PUBLIC=!!window.KIDS_PUBLIC;
+let qk=null;try{qk=new URLSearchParams(location.search).get('k');}catch(e){}
+const FIXED=PUBLIC&&qk&&KIDS[qk]?qk:null;
+function normalize(s){s=s&&typeof s==='object'?s:{};s.config=s.config||{};s.tx=s.tx||[];s.prices=s.prices||{};s.hist=s.hist||{};s.fxHist=s.fxHist||{};return s;}
+let ST;try{ST=normalize(JSON.parse(document.getElementById('state').textContent));}catch(e){ST=normalize({});}
+const U={view:FIXED?'kid':'home',kid:FIXED,ptab:'dep',tipOffset:0,proj:{monthly:null,years:10},ignoreLock:false,
+  A:null,aReady:false,canWrite:null,parentUntil:0,form:{kid:'michaela',mode:'withdraw'}};
+let pendingToast=null;
+try{const r=JSON.parse(sessionStorage.getItem('resume')||'null');
+  if(r){sessionStorage.removeItem('resume');if(r.until>Date.now()){U.view='parent';U.ptab=r.ptab||'dep';U.form=r.form||U.form;U.parentUntil=r.until;pendingToast=r.msg;}}}catch(e){}
+
+/* ===== helpers ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf0=new Intl.NumberFormat('he-IL',{maximumFractionDigits:0});
+const nf2=new Intl.NumberFormat('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nfU=new Intl.NumberFormat('he-IL',{maximumFractionDigits:4});
+const z=v=>Math.abs(v)<0.005?0:v;
+const moneyTxt=(v,d=0)=>{v=z(v);return (v<0?'−':'')+'₪'+(d?nf2:nf0).format(Math.abs(v));};
+const money=(v,d=0)=>`<span class="num">${moneyTxt(v,d)}</span>`;
+const pctTxt=v=>(v>0.0005?'+':v<-0.0005?'−':'')+Math.abs(v*100).toFixed(1)+'%';
+const pct=v=>`<span class="num">${pctTxt(v)}</span>`;
+const today=()=>new Date().toLocaleDateString('en-CA');
+const nowISO=()=>new Date().toISOString();
+const pd=d=>new Date(d+'T12:00:00');
+const G=(k,f,m)=>KIDS[k].g==='f'?f:m;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
+function ago(iso){
+  if(!iso) return 'עוד לא';
+  const m=(Date.now()-new Date(iso).getTime())/60000;
+  if(m<2) return 'עכשיו';if(m<60) return `לפני ${Math.round(m)} דקות`;
+  const h=m/60;if(h<24) return `לפני ${Math.round(h)} שעות`;
+  const d=h/24;return d<2?'אתמול':`לפני ${Math.round(d)} ימים`;
+}
+function kidProfile(k){let p={};try{p=JSON.parse(ls.get('kidProfile:'+k)||'{}')}catch(e){}return {...KIDS[k],color:p.color||KIDS[k].color,emoji:p.emoji||KIDS[k].emoji};}
+function setKidColor(k){document.documentElement.style.setProperty('--kid',k?kidProfile(k).color:'#3D5A80');}
+function toast(msg){if(!msg)return;const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
+const depositDay=()=>Math.min(28,Math.max(1,+ST.config.depositDay||10));
+const usdNow=()=>+ST.config.usdils||3.14;
+const taxRate=()=>{const r=+ST.config.taxRate;return r>=0&&r<1?r:0.25;};
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+const SK=new WeakMap();
+function lookup(map,d){if(!map)return undefined;let ks=SK.get(map);if(!ks){ks=Object.keys(map).sort();SK.set(map,ks);}
+  let lo=0,hi=ks.length-1,a=-1;while(lo<=hi){const m=(lo+hi)>>1;if(ks[m]<=d){a=m;lo=m+1;}else hi=m-1;}return a<0?undefined:map[ks[a]];}
+const fxAt=d=>+(lookup(ST.fxHist,d)??usdNow());
+const curOf=(sym,x)=>(ST.prices[sym]&&ST.prices[sym].currency)||(x&&x.currency)||'USD';
+const toILS=(p,cur,fx)=>p*(cur==='USD'?fx:cur==='ILA'?0.01:1);
+function unitILS(x,d){
+  const s=x.symbol,cur=curOf(s,x);let p;
+  if(!d){p=ST.prices[s]&&+ST.prices[s].price;if(!(p>0))p=+lookup(ST.hist[s],'9999');if(!(p>0))p=x.lastPrice&&x.lastPrice.price;return toILS(+p||0,cur,usdNow());}
+  p=+lookup(ST.hist[s],d);if(!(p>0)&&x.lastPrice)p=x.lastPrice.price;return toILS(+p||0,cur,fxAt(d));
+}
+
+/* ===== ledger ===== */
+function txSorted(kid){return ST.tx.filter(t=>t.kid===kid).sort((a,b)=>(a.date+(a.createdAt||'')).localeCompare(b.date+(b.createdAt||'')));}
+function newBook(){return {ck:0,cp:0,h:{},kidIn:0,parIn:0,kidOut:0,parOut:0,months:new Set()};}
+function applyTx(b,t){
+  const n=v=>+v||0;
+  if(t.type==='deposit'){b.ck+=n(t.kidAmount);b.cp+=n(t.parentAmount);b.kidIn+=n(t.kidAmount);b.parIn+=n(t.parentAmount);if(n(t.kidAmount)>0)b.months.add(t.date.slice(0,7));return;}
+  if(t.type==='withdraw'){b.ck-=n(t.amount);b.kidOut+=n(t.amount);return;}
+  if(t.type==='parentback'){b.cp-=n(t.amount);b.parOut+=n(t.amount);return;}
+  if(!t.symbol) return;
+  const x=b.h[t.symbol]||(b.h[t.symbol]={symbol:t.symbol,name:'',type:'index',currency:'USD',ku:0,pu:0,kc:0,pc:0,lastPrice:null});
+  if(t.name)x.name=t.name;if(t.assetType)x.type=t.assetType;if(t.currency)x.currency=t.currency;
+  if(+t.price>0)x.lastPrice={price:+t.price,date:t.date};
+  if(t.type==='buy'){const amt=n(t.amount),u=n(t.units),tot=b.ck+b.cp,r=tot>0.0001?Math.min(1,Math.max(0,b.ck/tot)):.5;
+    b.ck-=amt*r;b.cp-=amt*(1-r);x.ku+=u*r;x.pu+=u*(1-r);x.kc+=amt*r;x.pc+=amt*(1-r);}
+  else if(t.type==='sell'){const tot=x.ku+x.pu,q=Math.min(n(t.units),tot),f=tot>0?q/tot:0,s=tot>0?x.ku/tot:.5,p=n(t.proceeds);
+    b.ck+=p*s;b.cp+=p*(1-s);x.ku*=1-f;x.pu*=1-f;x.kc*=1-f;x.pc*=1-f;}
+  else if(t.type==='sellkid'){const q=Math.min(n(t.units),x.ku);if(x.ku>0)x.kc-=x.kc*q/x.ku;x.ku-=q;b.kidOut+=n(t.proceeds);}
+  else if(t.type==='dividend'){const tot=x.ku+x.pu,s=tot>0?x.ku/tot:.5,a=n(t.amount);b.ck+=a*s;b.cp+=a*(1-s);}
+}
+function summarize(b,d){
+  const holdings=[];let inv=0,kv=b.ck,pv=b.cp;const alloc={cash:Math.max(0,b.ck+b.cp),index:0,stock:0,bond:0};
+  for(const x of Object.values(b.h)){const u=x.ku+x.pu;if(u<1e-7)continue;const pr=unitILS(x,d),v=u*pr;
+    inv+=v;kv+=x.ku*pr;pv+=x.pu*pr;alloc[alloc[x.type]!==undefined&&x.type!=='cash'?x.type:'index']+=v;
+    holdings.push({...x,units:u,value:v,kidVal:x.ku*pr,parVal:x.pu*pr,cost:x.kc+x.pc,profit:v-(x.kc+x.pc)});}
+  holdings.sort((a,c)=>c.value-a.value);
+  const cash=b.ck+b.cp,value=cash+inv,kidNet=b.kidIn-b.kidOut,parNet=b.parIn-b.parOut,net=kidNet+parNet;
+  const unreal=holdings.reduce((a,h)=>a+h.profit,0),taxEst=Math.max(0,unreal)*taxRate();
+  return {holdings,cash,ck:b.ck,cp:b.cp,value,kv,pv,alloc,kidNet,parNet,net,profit:value-net,profitPct:net>0?(value-net)/net:0,
+    unreal,taxEst,afterTax:value-taxEst,
+    kidIn:b.kidIn,parIn:b.parIn,kidOut:b.kidOut,parOut:b.parOut,months:b.months};
+}
+function ledger(kid){const b=newBook(),txs=txSorted(kid);txs.forEach(t=>applyTx(b,t));const L=summarize(b);L.txs=txs;return L;}
+function series(kid){
+  const txs=txSorted(kid);if(!txs.length)return null;
+  const first=txs[0].date,t=today(),ds=new Set(txs.map(x=>x.date));ds.add(t);
+  for(const s of new Set(txs.map(x=>x.symbol).filter(Boolean))) for(const d of Object.keys(ST.hist[s]||{})) if(d>=first&&d<=t) ds.add(d);
+  for(const d of Object.keys(ST.fxHist)) if(d>=first&&d<=t) ds.add(d);
+  let dates=[...ds].sort();
+  if(dates.length>180){const st=(dates.length-1)/179,s=[];for(let i=0;i<180;i++)s.push(dates[Math.round(i*st)]);dates=[...new Set(s)];}
+  const b=newBook();let i=0;const out=[];
+  for(const d of dates){while(i<txs.length&&txs[i].date<=d)applyTx(b,txs[i++]);const S=summarize(b,d===t?undefined:d);out.push({date:d,value:S.value,net:S.net});}
+  return out.length>=2?out:null;
+}
+function streakInfo(months){
+  const now=new Date(),key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  let d=new Date(now.getFullYear(),now.getMonth(),1);if(!months.has(key(d)))d.setMonth(d.getMonth()-1);
+  let streak=0;while(months.has(key(d))){streak++;d.setMonth(d.getMonth()-1);}
+  let best=0,run=0,prev=null;
+  for(const m of [...months].sort()){const [y,mm]=m.split('-').map(Number),idx=y*12+mm;run=(prev!==null&&idx===prev+1)?run+1:1;best=Math.max(best,run);prev=idx;}
+  const doneThis=months.has(key(new Date(now.getFullYear(),now.getMonth(),1))),dd=depositDay();
+  let next=new Date(now.getFullYear(),now.getMonth(),dd);
+  if(doneThis||now.getDate()>dd)next=new Date(now.getFullYear(),now.getMonth()+1,dd);
+  const days=Math.round((next-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
+  return {streak,best,doneThis,next,days};
+}
+
+/* ===== graphics ===== */
+function jarSVG(L){
+  const top=60,bottom=200,H=bottom-top,ref=Math.max(L.value,L.net),goal=MILESTONES.find(m=>m>ref)||Math.ceil(ref*1.5);
+  const sc=v=>Math.max(0,Math.min(1,v/goal))*H;
+  const kn=Math.max(0,L.kidNet),pn=Math.max(0,L.parNet);let layers=[];
+  if(L.net>0){if(L.profit>=0)layers=[[kn,'var(--kid)'],[pn,'var(--gold)'],[L.profit,'var(--leaf)']];
+    else{const r=L.value/L.net;layers=[[kn*r,'var(--kid)'],[pn*r,'var(--gold)']];}}
+  let y=bottom,rects='';
+  for(const [v,c] of layers){const hh=sc(v);if(hh<=0)continue;y-=hh;rects+=`<rect x="0" y="${y.toFixed(1)}" width="160" height="${hh.toFixed(1)}" fill="${c}"/>`;}
+  const ly=(bottom-sc(L.net)).toFixed(1);
+  const dash=L.profit<-0.5&&L.net>0?`<line x1="14" x2="146" y1="${ly}" y2="${ly}" stroke="var(--loss)" stroke-width="2.5" stroke-dasharray="6 5"/>`:'';
+  const path='M30 40 H130 V52 Q150 60 150 82 V182 Q150 200 132 200 H28 Q10 200 10 182 V82 Q10 60 30 52 Z';
+  return {goal,svg:`<svg class="jar" viewBox="0 0 160 212" role="img" aria-label="צנצנת הקופה">
+    <defs><clipPath id="jarclip"><path d="${path}"/></clipPath></defs>
+    <path d="${path}" fill="var(--surface)"/><g clip-path="url(#jarclip)">${rects}${dash}</g>
+    <path d="${path}" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="34" y="24" width="92" height="16" rx="6" fill="var(--ink)"/><rect x="66" y="28" width="28" height="5" rx="2.5" fill="var(--surface)"/>
+    <path d="M26 92 Q24 130 26 168" stroke="var(--surface)" stroke-width="5" stroke-linecap="round" fill="none" opacity=".6"/></svg>`};
+}
+function donutSVG(alloc,total){
+  const r=52,C=2*Math.PI*r,active=CLASSES.filter(([k])=>alloc[k]>0.005);let off=0,arcs='';
+  const gap=active.length>1?2.5:0;
+  for(const [k] of active){const len=alloc[k]/total*C;
+    arcs+=`<circle r="${r}" cx="75" cy="75" fill="none" stroke="var(--c-${k})" stroke-width="24" stroke-dasharray="${Math.max(0.5,len-gap).toFixed(2)} ${(C-Math.max(0.5,len-gap)).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 75 75)"/>`;off+=len;}
+  if(!active.length) arcs=`<circle r="${r}" cx="75" cy="75" fill="none" stroke="var(--sunk)" stroke-width="24"/>`;
+  return `<svg viewBox="0 0 150 150" role="img" aria-label="התפלגות התיק">${arcs}
+    <text x="75" y="72" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--f-body)">סה"כ</text>
+    <text x="75" y="92" text-anchor="middle" font-size="19" font-weight="700" fill="var(--ink)" font-family="var(--f-display)">${esc(moneyTxt(total))}</text></svg>`;
+}
+function allocLegend(alloc,total){
+  return CLASSES.map(([k,l])=>{const v=alloc[k],p=total>0?v/total:0;
+    return `<div class="li ${v>0.005?'':'zero'}"><span class="dot" style="background:var(--c-${k})"></span><span>${l}</span><span class="p num">${Math.round(p*100)}%</span><span class="v">${money(v)}</span></div>`;}).join('');
+}
+function stackBar(alloc,total){
+  if(total<=0) return '<div class="stackbar"></div>';
+  return `<div class="stackbar">${CLASSES.map(([k])=>alloc[k]>0.005?`<i style="width:${alloc[k]/total*100}%;background:var(--c-${k})" title="${k}"></i>`:'').join('')}</div>`;
+}
+function niceStep(raw){const p=Math.pow(10,Math.floor(Math.log10(raw||1))),n=raw/p;return (n<=1?1:n<=2?2:n<=5?5:10)*p;}
+function chartSVG(pts){
+  if(!pts)return null;
+  const W=600,Hh=220,pl=56,pr=14,pt=12,pb=28;
+  const x0=pd(pts[0].date).getTime(),x1=Math.max(pd(pts[pts.length-1].date).getTime(),x0+864e5*7);
+  const yMax=Math.max(...pts.map(p=>Math.max(p.value,p.net)),1)*1.12;
+  const X=d=>pl+(pd(d).getTime()-x0)/(x1-x0)*(W-pl-pr),Y=v=>pt+(1-Math.max(0,v)/yMax)*(Hh-pt-pb);
+  const step=niceStep(yMax/4);let grid='';
+  for(let v=0;v<=yMax;v+=step)grid+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--line)"/><text x="${pl-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end" font-size="12" fill="var(--muted)">₪${nf0.format(v)}</text>`;
+  let np='';pts.forEach((p,i)=>{const x=X(p.date).toFixed(1),y=Y(p.net).toFixed(1);np+=i===0?`M${x},${y}`:`H${x}V${y}`;});
+  const vp=pts.map((p,i)=>(i?'L':'M')+X(p.date).toFixed(1)+','+Y(p.value).toFixed(1)).join('');
+  const last=pts[pts.length-1];
+  const area=vp+`L${X(last.date).toFixed(1)},${Y(0)}L${X(pts[0].date).toFixed(1)},${Y(0)}Z`;
+  const lab=t=>new Date(t).toLocaleDateString('he-IL',{month:'short',year:'2-digit'});
+  return `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="גרף שווי הקופה לאורך זמן">${grid}
+    <path d="${area}" fill="var(--kid)" opacity=".13"/>
+    <path d="${np}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="5 4"/>
+    <path d="${vp}" fill="none" stroke="var(--kid)" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="${X(last.date).toFixed(1)}" cy="${Y(last.value).toFixed(1)}" r="5.5" fill="var(--kid)" stroke="var(--surface)" stroke-width="2.5"/>
+    <text x="${pl}" y="${Hh-6}" font-size="12" fill="var(--muted)">${lab(x0)}</text>
+    <text x="${W-pr}" y="${Hh-6}" font-size="12" fill="var(--muted)" text-anchor="end">היום</text></svg>`;
+}
+
+/* ===== render ===== */
+function render(){
+  const lock=PUBLIC?null:ls.get('kidLock');
+  if(U.view==='home'&&lock&&KIDS[lock]&&!U.ignoreLock){U.view='kid';U.kid=lock;}
+  if(PUBLIC&&U.view==='parent')U.view='home';
+  setKidColor(U.view==='kid'?U.kid:null);
+  $('#app').innerHTML=U.view==='kid'?kidView(U.kid):U.view==='parent'?parentView():homeView();
+  bind();
+  if(pendingToast){toast(pendingToast);pendingToast=null;}
+}
+function homeView(){
+  const card=k=>{const p=kidProfile(k);return `<button class="kidcard" data-go-kid="${k}" style="--kid:${p.color}"><span class="avatar">${p.emoji}</span><b>${p.name}</b><span class="muted small">לקופה של ${p.name}</span></button>`;};
+  return `<h1 class="home-title">של מי הקופה?</h1>
+  <p class="muted" style="margin:0 0 18px">כל שקל שנכנס לקופה מקבל שקל נוסף מההורים.</p>
+  <div class="kids">${card('michaela')}${card('idan')}</div>
+  ${PUBLIC?'':'<div class="parentlink"><button class="iconbtn" data-parent>🔒 מצב הורה</button></div>'}`;
+}
+function holdingsHTML(k,L){
+  const groups=[];
+  if(z(L.cash)>0){const tot=Math.max(0.01,L.ck+L.cp);
+    groups.push(`<div class="group"><div class="ghead" style="--gc:var(--c-cash)"><h3><span class="dot" style="background:var(--c-cash)"></span>מזומן</h3><b>${money(L.cash)}</b></div>
+      <div class="hold"><div><span class="sym">שקלים</span><div class="muted small">כסף שמחכה להשקעה</div></div><div class="val">${money(L.cash)}</div>
+      <div class="split"><i style="width:${Math.max(0,L.ck)/tot*100}%;background:var(--kid)"></i><i style="width:${Math.max(0,L.cp)/tot*100}%;background:var(--gold)"></i></div></div></div>`);}
+  for(const [cls,label] of CLASSES.slice(1)){
+    const hs=L.holdings.filter(h=>(h.type||'index')===cls);if(!hs.length)continue;
+    const sub=hs.reduce((a,h)=>a+h.value,0);
+    groups.push(`<div class="group"><div class="ghead" style="--gc:var(--c-${cls})"><h3><span class="dot" style="background:var(--c-${cls})"></span>${label}</h3><b>${money(sub)}</b></div>
+      ${hs.map(h=>{const c=h.profit>0.5?'up':h.profit<-0.5?'down':'flat',tot=(h.kidVal+h.parVal)||1;
+        return `<div class="hold"><div><span class="sym">${esc(h.symbol)}</span><div class="muted small">${esc(h.name)}${h.name?' · ':''}<span class="num">${nfU.format(h.units)}</span> יחידות</div></div>
+        <div class="val">${money(h.value)}<div><span class="pill ${c}">${pct(h.cost?h.profit/h.cost:0)}</span></div></div>
+        <div class="split" title="החלק שלך מול החלק של ההורים"><i style="width:${h.kidVal/tot*100}%;background:var(--kid)"></i><i style="width:${h.parVal/tot*100}%;background:var(--gold)"></i></div></div>`;}).join('')}</div>`);
+  }
+  return groups.join('')||`<div class="empty">עוד אין כאן כלום. אחרי ההפקדה הראשונה יופיע כאן מה יש ${G(k,'לך','לך')}.</div>`;
+}
+function historyKid(k,L){
+  return L.txs.slice().reverse().map(t=>{
+    const d=pd(t.date);let title='',parts='';
+    switch(t.type){
+      case 'deposit':title='הפקדה לקופה';parts=`<span class="tag kid">שלך ${money(+t.kidAmount||0)}</span><span class="tag par">מההורים ${money(+t.parentAmount||0)}</span>`;break;
+      case 'buy':title=`קנינו <span class="num">${nfU.format(+t.units||0)}</span> יחידות של ${esc(t.symbol)}`;parts=`<span class="tag neu">${TYPE1[t.assetType]||''} · ${money(+t.amount||0)}</span>`;break;
+      case 'sell':title=`מכרנו <span class="num">${nfU.format(+t.units||0)}</span> יחידות של ${esc(t.symbol)}`;parts=`<span class="tag neu">${money(+t.proceeds||0)} חזרו למזומן</span>`;break;
+      case 'sellkid':title=`${G(k,'מכרת','מכרת')} מהחלק שלך ב-${esc(t.symbol)}`;parts=`<span class="tag kid">${G(k,'קיבלת','קיבלת')} ${money(+t.proceeds||0)}</span>`;break;
+      case 'dividend':title=`דיבידנד מ-${esc(t.symbol)}`;parts=`<span class="tag neu">${money(+t.amount||0)} נכנסו למזומן</span>`;break;
+      case 'withdraw':title=`${G(k,'משכת','משכת')} מזומן`;parts=`<span class="tag kid">${G(k,'קיבלת','קיבלת')} ${money(+t.amount||0)}</span>`;break;
+      case 'parentback':title='ההורים לקחו מזומן מהחלק שלהם';parts=`<span class="tag par">${money(+t.amount||0)}</span>`;break;
+      default:return '';
+    }
+    return `<div class="tx"><div class="d"><b class="num">${d.getDate()}</b><small>${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</small></div>
+      <div><div class="t">${title}</div><div class="parts">${parts}</div>${t.note?`<div class="muted small">${esc(t.note)}</div>`:''}</div></div>`;
+  }).join('')||`<div class="empty">ההיסטוריה תתחיל כאן.</div>`;
+}
+function kidView(k){
+  const p=kidProfile(k),L=ledger(k),st=streakInfo(L.months),{svg,goal}=jarSVG(L),lock=PUBLIC?null:ls.get('kidLock');
+  const cls=L.profit>0.5?'up':L.profit<-0.5?'down':'flat',empty=L.txs.length===0;
+  const tip=TIPS[(Math.floor(Date.now()/864e5)+U.tipOffset)%TIPS.length];
+  const now=new Date();let strip='';
+  for(let i=11;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1),key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    strip+=`<div class="m ${L.months.has(key)?'on':''} ${i===0?'now':''}"><i></i>${MONTHS[d.getMonth()]}</div>`;}
+  const badges=[['הפקדה ראשונה',L.months.size>=1],['3 חודשים ברצף',st.best>=3],['חצי שנה ברצף',st.best>=6],['שנה שלמה ברצף',st.best>=12],
+    ['₪500 בקופה',L.value>=500],['₪1,000 בקופה',L.value>=1000],['₪5,000 בקופה',L.value>=5000],
+    ['פיזור: 2 סוגים',CLASSES.slice(1).filter(([c])=>L.alloc[c]>0.5).length>=2]]
+    .map(([t,g])=>`<span class="badge ${g?'got':''}">${g?'★ ':''}${t}</span>`).join('');
+  const mname=d=>MONTHS[d.getMonth()].replace('׳','');
+  const nextTxt=st.doneThis?`${G(k,'הפקדת','הפקדת')} החודש. ההפקדה הבאה ב-${st.next.getDate()} ב${mname(st.next)}, עוד <span class="num">${st.days}</span> ימים.`
+    :(st.days===0?'היום יום ההפקדה!':`ההפקדה הבאה ב-${st.next.getDate()} ב${mname(st.next)}, עוד <span class="num">${st.days}</span> ימים.`);
+  const chart=chartSVG(series(k));
+  const monthly=U.proj.monthly??(L.months.size?Math.round(L.kidIn/L.months.size):50);
+  const updated=ST.config.pricesUpdatedAt||Object.values(ST.prices).map(x=>x.updatedAt).filter(Boolean).sort().pop();
+  return `<div class="top">
+    <div class="who"><button class="avatar" data-pick aria-label="לבחור דמות וצבע">${p.emoji}</button><h1>הקופה של ${p.name}</h1></div>
+    ${FIXED?'':`<button class="iconbtn" data-home>${lock?'🔒 ':''}החלפה</button>`}</div>
+  <div class="stack">
+    <section class="card hero">
+      <div>
+        <div class="label">יש לך בקופה</div>
+        <div class="big">${money(L.value)}</div>
+        <div style="margin-bottom:12px">${empty?'<span class="pill flat">מחכים להפקדה הראשונה</span>':`<span class="pill ${cls}">${L.profit>=0?'▲':'▼'} ${money(Math.abs(L.profit))} · ${pct(L.profitPct)}</span>`}</div>
+        <div class="legend">
+          <div class="li"><span><span class="dot" style="background:var(--kid)"></span>הכסף שלך</span>${money(L.kidNet)}</div>
+          <div class="li"><span><span class="dot" style="background:var(--gold)"></span>מתנת ההורים</span>${money(L.parNet)}</div>
+          <div class="li"><span><span class="dot" style="background:var(--leaf)"></span>${L.profit>=0?'צמיחה':'ירידה זמנית'}</span>${money(L.profit)}</div>
+        </div>
+      </div>
+      ${svg}
+      <div class="goal">היעד הבא: ${money(goal)} · עוד ${money(Math.max(0,goal-L.value))}<div class="bar"><i style="width:${Math.min(100,L.value/goal*100)}%"></i></div></div>
+    </section>
+    ${L.holdings.length?`<section class="card">
+      <h2>רווח על הנייר ומס</h2>
+      <div class="stats">
+        <div class="stat"><small>רווח שעוד לא מומש</small><b style="color:${L.unreal>=0?'var(--leaf)':'var(--loss)'}">${money(L.unreal)}</b></div>
+        <div class="stat"><small>מס משוער (${Math.round(taxRate()*100)}%)</small><b>${money(-L.taxEst)}</b></div>
+        <div class="stat"><small>נשאר אחרי מס</small><b>${money(L.afterTax)}</b></div>
+      </div>
+      <p class="muted small" style="margin:10px 0 0">${L.unreal>0.5?`הרווח הזה קיים רק "על הנייר". אם נמכור היום, המדינה תיקח בערך ${money(L.taxEst)} כמס רווחי הון, ובקופה יישארו בערך ${money(L.afterTax)}.`:L.unreal<-0.5?'כרגע אין רווח, אז גם אין מס לשלם. אם נמכור בהפסד, לא משלמים מס.':'כשיהיה רווח, יופיע כאן כמה מס צריך לשלם עליו אם מוכרים.'} מס משלמים רק כשמוכרים, לא כל עוד מחזיקים.</p>
+    </section>`:''}
+    ${L.profit<-0.5?`<section class="card tip"><p>הקופה ירדה קצת. זה קורה לכל משקיע, וזה לא אומר שהכסף נעלם. ${G(k,'מי שממשיכה','מי שממשיך')} להפקיד עכשיו קונה יותר יחידות באותו סכום.</p></section>`:''}
+    <section class="card">
+      <h2>ממה הקופה בנויה</h2>
+      <div class="alloc">${donutSVG(L.alloc,Math.max(0,L.value))}<div class="aleg">${allocLegend(L.alloc,Math.max(0,L.value))}</div></div>
+    </section>
+    <section class="card">
+      <h2>מה יש לי</h2>${holdingsHTML(k,L)}
+      <p class="muted small" style="margin:12px 0 0">מחירים עודכנו ${ago(updated)}. דולר: <span class="num">₪${usdNow().toFixed(3)}</span> לפי XE</p>
+    </section>
+    <section class="card"><div class="stats">
+      <div class="stat"><small>${G(k,'הכנסת','הכנסת')}</small><b>${money(L.kidIn)}</b></div>
+      <div class="stat"><small>ההורים הוסיפו</small><b>${money(L.parIn)}</b></div>
+      <div class="stat"><small>${G(k,'משכת','משכת')}</small><b>${money(L.kidOut)}</b></div></div></section>
+    <section class="card">
+      <div class="spread"><h2>רצף הפקדות</h2><div><span class="streakbig num">${st.streak}</span> <span class="muted">חודשים</span></div></div>
+      <p class="muted small" style="margin:4px 0 0">${nextTxt}</p>
+      <div class="months">${strip}</div><div class="badges">${badges}</div>
+    </section>
+    <section class="card"><h2>איך הקופה גדלה</h2>
+      ${chart?`<div class="chartwrap">${chart}</div><div class="chartlegend"><span><b style="color:var(--kid)">━</b> כמה הקופה שווה</span><span><b style="color:var(--gold)">┅</b> כמה הכנסנו</span></div>`:`<div class="empty">הגרף יתחיל להצטייר אחרי כמה ימים של השקעה.</div>`}
+    </section>
+    <section class="card"><h2>מה קרה בקופה</h2>${historyKid(k,L)}</section>
+    <section class="card tip"><div class="spread" style="margin-bottom:8px"><h2 style="margin:0">רגע של למידה</h2><button class="iconbtn" data-tip>עוד טיפ</button></div><p>${tip}</p></section>
+    <section class="card"><h2>מה יקרה אם ${G(k,'אמשיך','אמשיך')}?</h2>
+      <div class="grid2">
+        <label for="pmonthly">כמה ${G(k,'תפקידי','תפקיד')} כל חודש (₪)<input id="pmonthly" type="number" min="0" step="10" value="${monthly}"></label>
+        <label for="pyears">במשך <span id="pyl">${U.proj.years}</span> שנים<input id="pyears" type="range" min="1" max="20" value="${U.proj.years}"></label>
+      </div><div id="projout" style="margin-top:14px">${projHTML(k,projection(L.value,monthly,U.proj.years))}</div>
+    </section>
+    <p class="foot">הקופה מתעדת השקעות שנעשות בחשבון של ההורים.${PUBLIC&&ST.syncedAt?` עודכן ${ago(ST.syncedAt)}.`:''}</p>
+  </div>`;
+}
+function projection(start,monthly,years){const i=0.07/12,n=years*12;let v=start;for(let m=0;m<n;m++)v=v*(1+i)+monthly*2;const kid=monthly*n;return {v,kid,par:kid,grow:v-start-2*kid};}
+function projHTML(k,p){
+  return `<div class="proj-big">${money(p.v)}</div>
+  <div class="row small" style="margin-top:6px"><span class="tag kid">${G(k,'את','אתה')}: ${money(p.kid)}</span><span class="tag par">ההורים: ${money(p.par)}</span><span class="pill up">צמיחה: ${money(Math.max(0,p.grow))}</span></div>
+  <p class="muted small" style="margin:8px 0 0">החישוב מניח צמיחה של 7% בשנה בממוצע. זה לא מובטח: יש שנים של עליות ויש שנים של ירידות.</p>`;
+}
+
+/* ===== parent desk ===== */
+function writeNotice(){
+  if(U.canWrite===false||(U.aReady&&!U.A)) return `<p class="notice">במכשיר הזה אפשר רק לצפות. כדי לשמור שינויים, פתחי את הקופה מהחשבון שלך ב-claude.ai.</p>`;
+  return '';
+}
+function parentView(){
+  const tabs=[['dep','הפקדה וקנייה'],['more','מכירה ומשיכה'],['prices','מחירים'],['history','היסטוריה'],['settings','הגדרות']];
+  return `<div class="top"><div class="who"><span class="avatar" style="background:var(--sunk);border-color:var(--ink)">🔑</span><h1>שולחן ההורים</h1></div>
+    <button class="iconbtn" data-home>יציאה</button></div>
+  <div class="stack"><div id="wnotice">${writeNotice()}</div>
+    <div class="grid2">${Object.keys(KIDS).map(k=>{const L=ledger(k),p=kidProfile(k);
+      return `<div class="card" style="--kid:${p.color};padding:14px;display:flex;flex-direction:column;gap:6px">
+        <div class="spread"><b style="font-family:var(--f-display);font-size:1.1rem">${p.emoji} ${p.name}</b><span class="pill ${L.profit>0.5?'up':L.profit<-0.5?'down':'flat'}">${pct(L.profitPct)}</span></div>
+        <div style="font-family:var(--f-display);font-size:1.6rem;font-weight:700">${money(L.value,2)}</div>
+        ${stackBar(L.alloc,Math.max(0,L.value))}
+        <div class="small muted">מזומן ${money(L.cash,2)} · ילד/ה ${money(L.kidIn)} · הורים ${money(L.parIn)}</div>
+        <div class="small muted">רווח לא ממומש ${money(L.unreal,2)} · מס משוער ${money(L.taxEst,2)} · אחרי מס ${money(L.afterTax,2)}</div></div>`;}).join('')}</div>
+    <div class="tabs">${tabs.map(([id,t])=>`<button data-ptab="${id}" aria-pressed="${U.ptab===id}">${t}</button>`).join('')}</div>
+    <div id="ppanel">${U.ptab==='dep'?depForm():U.ptab==='more'?moreForm():U.ptab==='prices'?pricesPanel():U.ptab==='history'?historyPanel():settingsPanel()}</div>
+  </div>`;
+}
+function seg(name,opts,val){return `<div class="seg" data-seg="${name}">${opts.map(([v,l])=>`<button type="button" data-val="${v}" aria-pressed="${val===v}">${l}</button>`).join('')}</div>`;}
+const kidOpts=()=>Object.values(KIDS).map(k=>[k.id,k.name]);
+function knownSymbols(){const m={};for(const t of ST.tx)if(t.symbol)m[t.symbol]={...(m[t.symbol]||{}),name:t.name||m[t.symbol]?.name,type:t.assetType||m[t.symbol]?.type,currency:t.currency||m[t.symbol]?.currency,price:t.price||m[t.symbol]?.price};
+  for(const [s,p] of Object.entries(ST.prices))m[s]={...(m[s]||{}),...p,type:p.assetType||m[s]?.type};return m;}
+function depForm(){
+  const syms=knownSymbols();
+  return `<form class="card stack" id="pform" data-form="dep" autocomplete="off">
+    <h2>הפקדה וקנייה</h2>
+    ${seg('kid',kidOpts(),U.form.kid)}
+    <div class="grid2">
+      <label for="ddate">תאריך<input id="ddate" type="date" value="${today()}" required></label>
+      <label for="dkid">הילד/ה הפקיד/ה (₪)<input id="dkid" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0 = קנייה מהמזומן"></label>
+    </div>
+    <label class="check"><input type="checkbox" id="dbuy" checked> לקנות עכשיו נייר ערך</label>
+    <fieldset id="dbuyset"><legend>הקנייה</legend>
+      <div class="grid2">
+        <label for="bsym">סימול (למשל VOO)<input id="bsym" list="symlist" style="direction:ltr;text-align:right;text-transform:uppercase"></label>
+        <label for="bname">שם לתצוגה<input id="bname" placeholder="S&amp;P 500"></label>
+      </div>
+      <datalist id="symlist">${Object.keys(syms).map(s=>`<option value="${esc(s)}">`).join('')}</datalist>
+      <div class="grid2">
+        <label for="btype">סוג<select id="btype"><option value="index">מדד</option><option value="stock">מניה</option><option value="bond">אג"ח</option></select></label>
+        <label for="bcur">מטבע המחיר<select id="bcur"><option value="USD">דולר</option><option value="ILS">שקל</option><option value="ILA">אגורות (בורסת ת"א)</option></select></label>
+      </div>
+      <div class="grid2">
+        <label for="bprice">מחיר ליחידה<input id="bprice" type="number" min="0" step="any" inputmode="decimal"></label>
+        <label for="bfx">שער דולר בקנייה<input id="bfx" type="number" min="0" step="any" value="${usdNow()}"></label>
+      </div>
+      <div class="grid2">
+        <label for="bamt">סכום להשקעה (₪)<input id="bamt" type="number" min="0" step="0.01"></label>
+        <label for="bunits">יחידות שנקנו<input id="bunits" type="number" min="0" step="any"></label>
+      </div>
+    </fieldset>
+    <label for="dnote">הערה<input id="dnote" placeholder="לא חובה"></label>
+    <div class="preview" id="dprev"></div>
+    <div class="row"><button class="btn" type="submit" id="dsave">שמירה</button></div>
+  </form>`;
+}
+function moreForm(){
+  const kid=U.form.kid,mode=U.form.mode,L=ledger(kid);
+  const modes=[['withdraw','משיכת מזומן'],['sellkid','מכירת חלק הילד/ה'],['sell','מכירת החזקה'],['dividend','דיבידנד'],['parentback','החזר להורים']];
+  const help={withdraw:'הילד/ה מושך/ת מהחלק שלו/ה במזומן.',sellkid:'מוכרים רק את החלק של הילד/ה בנייר, והכסף יוצא אליו/ה. מתנת ההורים נשארת מושקעת.',
+    sell:'מכירה באישור הורה. הכסף חוזר למזומן בקופה ומתחלק לפי החלקים. אם IB ניכה מס, הזיני מחיר שמשקף את הסכום נטו.',dividend:'דיבידנד שהתקבל ב-IB נכנס למזומן לפי החלקים בנייר. הזיני את הסכום נטו, אחרי המס שנוכה במקור.',parentback:'ההורים מוציאים מזומן מהחלק שלהם.'};
+  const holdSel=(maxKey)=>L.holdings.length?`<label for="msym">נייר ערך<select id="msym">${L.holdings.map(h=>{const max=maxKey==='ku'?h.ku:h.units;
+    return `<option value="${esc(h.symbol)}" data-max="${max}" data-cur="${curOf(h.symbol,h)}" data-ks="${h.units?h.ku/h.units:.5}">${esc(h.symbol)} · עד ${nfU.format(max)} יח׳</option>`;}).join('')}</select></label>`:`<div class="empty">אין החזקות</div>`;
+  let body='';
+  if(mode==='withdraw'||mode==='parentback'){const max=Math.max(0,mode==='withdraw'?L.ck:L.cp);
+    body=`<p class="info">זמין: ${money(max,2)}</p><div class="grid2"><label for="mamt">סכום (₪)<input id="mamt" type="number" min="0" max="${max.toFixed(2)}" step="0.01" data-max="${max}"></label><label for="mdate">תאריך<input id="mdate" type="date" value="${today()}"></label></div>`;}
+  else if(mode==='dividend'){body=`${holdSel('units')}<div class="grid2"><label for="mamt">סכום שהתקבל (₪)<input id="mamt" type="number" min="0" step="0.01"></label><label for="mdate">תאריך<input id="mdate" type="date" value="${today()}"></label></div>`;}
+  else {body=`${holdSel(mode==='sellkid'?'ku':'units')}
+    <div class="grid2"><label for="munits">יחידות<input id="munits" type="number" min="0" step="any"></label><label for="mdate">תאריך<input id="mdate" type="date" value="${today()}"></label></div>
+    <div class="grid2"><label for="mprice">מחיר ליחידה<input id="mprice" type="number" min="0" step="any"></label><label for="mfx">שער דולר<input id="mfx" type="number" min="0" step="any" value="${usdNow()}"></label></div>`;}
+  return `<form class="card stack" id="pform" data-form="more" autocomplete="off">
+    <h2>מכירה, משיכה ודיבידנד</h2>
+    ${seg('kid',kidOpts(),kid)}${seg('mode',modes,mode)}
+    <p class="muted small" style="margin:0">${help[mode]}</p>
+    ${body}
+    <label for="mnote">הערה<input id="mnote" placeholder="לא חובה"></label>
+    <div class="preview" id="mprev"></div>
+    <div class="row"><button class="btn" type="submit" id="msave">שמירה</button></div>
+  </form>`;
+}
+function pricesPanel(){
+  const syms=knownSymbols(),keys=Object.keys(syms).sort();
+  return `<form class="card stack" id="pform" data-form="prices">
+    <h2>מחירים ושער דולר</h2>
+    <p class="muted small" style="margin:0">עדכון אוטומטי בימים שני עד שישי בערב, אחרי סגירת הבורסות. שער הדולר נלקח מ-XE בלבד. עדכון אחרון: ${ago(ST.config.pricesUpdatedAt)}.</p>
+    <label for="fxin">דולר / שקל<input id="fxin" type="number" step="any" value="${usdNow()}"></label>
+    <p class="muted small" style="margin:-6px 0 0">${ST.config.fxSource==='xe'?'לפי XE':'עודכן ידנית'}, ${ago(ST.config.fxAsOf)}</p>
+    ${keys.length?`<div class="tablewrap"><table><thead><tr><th>סימול</th><th>מחיר</th><th>מטבע</th><th>עודכן</th></tr></thead><tbody>
+      ${keys.map((s,i)=>{const p=ST.prices[s]||{},k=syms[s];return `<tr><td><b>${esc(s)}</b><div class="muted small">${esc(k.name||'')}</div></td>
+        <td><input type="number" step="any" id="pr${i}" data-sym="${esc(s)}" value="${p.price??k.price??''}"></td>
+        <td>${{USD:'$',ILS:'₪',ILA:'אג׳'}[p.currency||k.currency||'USD']}</td>
+        <td><span class="src ${p.source==='auto'?'auto':''}">${p.source==='auto'?'אוטומטי':p.source==='manual'?'ידני':'מהקנייה'}</span><div class="muted small">${ago(p.updatedAt)}</div></td></tr>`;}).join('')}
+    </tbody></table></div>`:`<div class="empty">ניירות ערך יופיעו כאן אחרי הקנייה הראשונה.</div>`}
+    <div class="row"><button class="btn" type="submit" id="psave">שמירת המחירים</button></div>
+  </form>`;
+}
+function historyPanel(){
+  const list=ST.tx.slice().sort((a,b)=>(b.date+(b.createdAt||'')).localeCompare(a.date+(a.createdAt||'')));
+  if(!list.length)return `<div class="card"><div class="empty">עוד אין פעולות.</div></div>`;
+  const T={deposit:'הפקדה',buy:'קנייה',sell:'מכירה',sellkid:'מכירת חלק ילד/ה',dividend:'דיבידנד',withdraw:'משיכה',parentback:'החזר להורים'};
+  return `<div class="card"><h2>כל הפעולות</h2>${list.map(t=>{const d=pd(t.date);
+    const amt=t.type==='deposit'?`ילד/ה ${moneyTxt(+t.kidAmount||0,2)} + הורים ${moneyTxt(+t.parentAmount||0,2)}`:t.type==='buy'?`${moneyTxt(+t.amount||0,2)} · ${nfU.format(+t.units||0)} יח׳ · מחיר ${t.price} ${t.currency||''}`
+      :(t.type==='sell'||t.type==='sellkid')?`${nfU.format(+t.units||0)} יח׳ · ${moneyTxt(+t.proceeds||0,2)}`:moneyTxt(+t.amount||0,2);
+    return `<div class="tx"><div class="d"><b class="num">${d.getDate()}</b><small>${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</small></div>
+      <div><div class="spread"><span class="t">${T[t.type]||t.type} · ${KIDS[t.kid]?.name||''}${t.symbol?' · '+esc(t.symbol):''}</span><button class="iconbtn" data-del="${esc(t.id)}">מחיקה</button></div>
+      <div class="small muted">${esc(amt)}</div>
+      <div class="row" data-confirm="${esc(t.id)}" hidden style="margin-top:8px"><span class="small">למחוק את הפעולה?</span><button class="btn danger" data-delyes="${esc(t.id)}">כן, למחוק</button><button class="btn ghost" data-delno="${esc(t.id)}">ביטול</button></div></div></div>`;}).join('')}</div>`;
+}
+function settingsPanel(){
+  const lock=ls.get('kidLock')||'';
+  return `<div class="card stack"><h2>הגדרות</h2>
+    <div class="row" style="align-items:flex-end"><label for="dday" style="flex:1">יום ההפקדה בחודש<input id="dday" type="number" min="1" max="28" value="${depositDay()}"></label><button class="btn" data-saveday>שמירה</button></div>
+    <div class="row" style="align-items:flex-end"><label for="taxin" style="flex:1">שיעור מס רווחי הון להערכה (%)<input id="taxin" type="number" min="0" max="60" step="0.5" value="${+(taxRate()*100).toFixed(2)}"></label><button class="btn" data-savetax>שמירה</button></div>
+    <p class="muted small" style="margin:0">ברירת המחדל 25%. אם חל עליכם מס יסף, אפשר להעלות את השיעור.</p>
+    <label for="lockSel">המכשיר הזה נפתח ישר לקופה של<select id="lockSel"><option value="">אף אחד (מסך בחירה)</option>${Object.values(KIDS).map(k=>`<option value="${k.id}" ${lock===k.id?'selected':''}>${k.name}</option>`).join('')}</select></label>
+    <p class="muted small" style="margin:0">כשהמכשיר נעול לילד, מעבר לקופה אחרת דורש קוד. ההגדרה נשמרת רק במכשיר הזה, כך שצריך לבחור אותה בטלפון של הילד/ה.</p>
+    <div class="row" style="align-items:flex-end"><label for="newpin" style="flex:1">קוד הורה חדש (4 ספרות)<input id="newpin" type="password" inputmode="numeric" maxlength="4"></label><button class="btn" data-savepin>החלפת קוד</button></div>
+  </div>`;
+}
+
+/* ===== saving ===== */
+async function save(mutate,msg){
+  if(!U.A){toast('שמירה אפשרית רק מהחשבון של ההורה ב-claude.ai');return false;}
+  const next=JSON.parse(JSON.stringify(ST));mutate(next);
+  try{sessionStorage.setItem('resume',JSON.stringify({until:Math.max(U.parentUntil,Date.now()+10*60000),ptab:U.ptab,form:U.form,msg}));}catch(e){}
+  try{await U.A.publish(pageHTML(next));return true;}
+  catch(e){
+    try{sessionStorage.removeItem('resume');}catch(_){}
+    const c=e&&e.code;
+    if(c==='conflict')toast('הקופה עודכנה בינתיים. הדף נטען מחדש, נסי שוב.');
+    else if(['not_writer','not_granted','consent_required','capability_disabled','capability_removed','not_declared'].includes(c)){U.canWrite=false;const w=$('#wnotice');if(w)w.innerHTML=writeNotice();toast('שמירה אפשרית רק מהחשבון של ההורה ב-claude.ai');}
+    else if(c==='too_large')toast('הקופה גדולה מדי לשמירה');
+    else if(c==='rate_limited')toast('יותר מדי שמירות ברצף. חכי דקה ונסי שוב.');
+    else toast('השמירה נכשלה. נסי שוב.');
+    return false;
+  }
+}
+
+/* ===== interactions ===== */
+const segVal=name=>{const b=document.querySelector(`.seg[data-seg="${name}"] button[aria-pressed="true"]`);return b?b.dataset.val:null;};
+function bind(){
+  document.querySelectorAll('[data-go-kid]').forEach(b=>b.onclick=()=>{U.view='kid';U.kid=b.dataset.goKid;U.proj.monthly=null;render();scrollTo(0,0);});
+  const home=$('[data-home]');if(home)home.onclick=()=>{
+    const lock=ls.get('kidLock');
+    if(U.view==='kid'&&lock)askPin(()=>{U.view='home';U.kid=null;U.ignoreLock=true;render();});
+    else{const wasKid=U.view==='kid';U.view='home';U.kid=null;U.parentUntil=0;if(wasKid)U.ignoreLock=true;render();}
+  };
+  const par=$('[data-parent]');if(par)par.onclick=()=>{if(U.parentUntil>Date.now()){U.view='parent';render();}else askPin(()=>{U.parentUntil=Date.now()+15*60000;U.view='parent';render();});};
+  const tip=$('[data-tip]');if(tip)tip.onclick=()=>{U.tipOffset++;render();};
+  const pick=$('[data-pick]');if(pick)pick.onclick=()=>openPicker(U.kid);
+  const pm=$('#pmonthly'),py=$('#pyears');
+  if(pm&&py){const upd=()=>{U.proj.monthly=Math.max(0,+pm.value||0);U.proj.years=+py.value;$('#pyl').textContent=py.value;
+    $('#projout').innerHTML=projHTML(U.kid,projection(ledger(U.kid).value,U.proj.monthly,U.proj.years));};pm.oninput=upd;py.oninput=upd;}
+  document.querySelectorAll('[data-ptab]').forEach(b=>b.onclick=()=>{U.ptab=b.dataset.ptab;render();});
+  document.querySelectorAll('.seg[data-seg]').forEach(sg=>sg.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    sg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));sg.dispatchEvent(new Event('segchange',{bubbles:true}));}));
+  const f=$('#pform');
+  if(f){if(f.dataset.form==='dep')bindDep(f);else if(f.dataset.form==='more')bindMore(f);else if(f.dataset.form==='prices')bindPrices(f);}
+  bindMisc();
+}
+function bindDep(f){
+  const el=id=>f.querySelector('#'+id),syms=knownSymbols();let amtTouched=false,unitsTouched=false;
+  el('bsym').addEventListener('change',()=>{const s=el('bsym').value.trim().toUpperCase();el('bsym').value=s;const k=syms[s];
+    if(k){if(k.name&&!el('bname').value)el('bname').value=k.name;if(k.type)el('btype').value=k.type;if(k.currency)el('bcur').value=k.currency;if(k.price&&!el('bprice').value)el('bprice').value=k.price;}calc();});
+  el('bamt').addEventListener('input',()=>{amtTouched=true;unitsTouched=false;calc();});
+  el('bunits').addEventListener('input',()=>{unitsTouched=true;calc();});
+  ['dkid','bprice','bfx'].forEach(id=>el(id).addEventListener('input',calc));
+  ['bcur','dbuy'].forEach(id=>el(id).addEventListener('change',calc));
+  f.addEventListener('segchange',()=>{U.form.kid=segVal('kid');calc();});
+  function vals(){
+    const kid=segVal('kid'),k=Math.max(0,+el('dkid').value||0),buy=el('dbuy').checked,cash=Math.max(0,ledger(kid).cash),avail=cash+2*k;
+    const cur=el('bcur').value,price=+el('bprice').value||0,fx=cur==='USD'?(+el('bfx').value||usdNow()):1,u1=toILS(price,cur,fx);
+    if(!amtTouched)el('bamt').value=k>0?+(2*k).toFixed(2):(cash>0?+cash.toFixed(2):'');
+    const amt=+el('bamt').value||0;
+    if(!unitsTouched&&u1>0)el('bunits').value=amt>0?+(amt/u1).toFixed(4):'';
+    return {kid,k,buy,cash,avail,cur,price,fx,amt,units:+el('bunits').value||0,sym:el('bsym').value.trim().toUpperCase()};
+  }
+  function calc(){
+    el('dbuyset').hidden=!el('dbuy').checked;el('bfx').closest('label').style.opacity=el('bcur').value==='USD'?1:.4;
+    const v=vals(),name=KIDS[v.kid].name;let lines=[];
+    if(v.k>0)lines.push(`<span>הפקדה: ${name} ${money(v.k,2)} + הורים ${money(v.k,2)} = <b>${money(2*v.k,2)}</b></span>`);
+    if(v.buy){lines.push(`<span>קנייה: ${money(v.amt,2)}${v.units?` → <span class="num">${nfU.format(v.units)}</span> יח׳ של ${esc(v.sym||'?')}`:''}</span>`);
+      if(v.amt>v.avail+0.01)lines.push(`<span style="color:var(--loss)">הסכום גבוה מהזמין (${money(v.avail,2)})</span>`);}
+    lines.push(`<span class="muted">מזומן אחרי: ${money(v.avail-(v.buy?v.amt:0),2)}</span>`);
+    el('dprev').innerHTML=lines.join('');
+  }
+  f.onsubmit=async e=>{
+    e.preventDefault();const v=vals(),date=el('ddate').value||today(),note=el('dnote').value.trim();
+    if(!v.k&&!v.buy){toast('אין מה לשמור');return;}
+    if(v.buy){
+      if(!/^[A-Z0-9.\-_]{1,20}$/.test(v.sym)){toast('סימול לא תקין');return;}
+      if(!(v.price>0)||!(v.units>0)||!(v.amt>0)){toast('חסר מחיר, סכום או יחידות');return;}
+      if(v.amt>v.avail+0.01){toast('הסכום גבוה מהמזומן הזמין');return;}
+    }
+    el('dsave').disabled=true;
+    const t0=Date.now();
+    const ok=await save(n=>{
+      if(v.k>0)n.tx.push({id:uid(),type:'deposit',kid:v.kid,date,kidAmount:v.k,parentAmount:v.k,note:v.buy?'':note,createdAt:new Date(t0).toISOString()});
+      if(v.buy){
+        const name=el('bname').value.trim(),type=el('btype').value;
+        n.tx.push({id:uid(),type:'buy',kid:v.kid,date,symbol:v.sym,name,assetType:type,currency:v.cur,price:v.price,fx:v.fx,units:v.units,amount:+v.amt.toFixed(2),note,createdAt:new Date(t0+1).toISOString()});
+        const p=n.prices[v.sym];
+        if(!p)n.prices[v.sym]={symbol:v.sym,name,assetType:type,currency:v.cur,price:v.price,updatedAt:nowISO(),source:'purchase',asOf:date};
+        else{if(name&&!p.name)p.name=name;if(!p.assetType)p.assetType=type;}
+        n.hist[v.sym]=n.hist[v.sym]||{};if(!n.hist[v.sym][date])n.hist[v.sym][date]=v.price;
+        if(v.cur==='USD'&&!n.fxHist[date])n.fxHist[date]=v.fx;
+      }
+    },'נשמר');
+    if(!ok)el('dsave').disabled=false;
+  };
+  calc();
+}
+function bindMore(f){
+  const el=id=>f.querySelector('#'+id),mode=U.form.mode,kid=U.form.kid;
+  f.addEventListener('segchange',()=>{U.form.kid=segVal('kid');U.form.mode=segVal('mode');$('#ppanel').innerHTML=moreForm();bind();});
+  function opt(){const s=el('msym');return s?s.selectedOptions[0]:null;}
+  function fillSym(){const o=opt();if(!o)return;const p=ST.prices[o.value];if(el('mprice'))el('mprice').value=p?.price??'';
+    if(mode==='sell'&&el('munits'))el('munits').value=+(+o.dataset.max).toFixed(6);calc();}
+  function calc(){
+    const pv=el('mprev');let ok=false,html='';
+    if(mode==='withdraw'||mode==='parentback'||mode==='dividend'){const a=+el('mamt').value||0,max=mode==='dividend'?Infinity:+el('mamt').dataset.max;
+      ok=a>0&&a<=max+0.005&&(mode!=='dividend'||!!opt());
+      if(mode==='dividend'&&opt()){const ks=+opt().dataset.ks;html=`לילד/ה ${money(a*ks,2)} · להורים ${money(a*(1-ks),2)} (למזומן)`;}
+      else html=a>max+0.005?`<span style="color:var(--loss)">יותר מהזמין</span>`:`${money(a,2)}`;}
+    else{const o=opt();if(o){const cur=o.dataset.cur,u=+el('munits').value||0,price=+el('mprice').value||0,fx=+el('mfx').value||usdNow(),max=+o.dataset.max;
+      el('mfx').closest('label').style.opacity=cur==='USD'?1:.4;
+      const pr=toILS(u*price,cur,fx);ok=u>0&&price>0&&u<=max+1e-9;
+      const h=ledger(kid).holdings.find(x=>x.symbol===o.value);
+      const costPart=!h?0:mode==='sellkid'?(h.ku>0?h.kc*Math.min(u,h.ku)/h.ku:0):(h.units>0?(h.kc+h.pc)*Math.min(u,h.units)/h.units:0);
+      const gain=pr-costPart,tax=Math.max(0,gain)*taxRate();
+      const taxLine=`<span class="muted">רווח שמתממש: ${money(gain,2)} · מס משוער ב-IB: ${money(tax,2)}${gain<=0?' (הפסד, אין מס)':''}</span>`;
+      if(u>max+1e-9)html=`<span style="color:var(--loss)">יותר מהזמין (${nfU.format(max)} יח׳)</span>`;
+      else if(mode==='sellkid')html=`<span>הילד/ה מקבל/ת ${money(pr,2)} לפני מס</span>${taxLine}`;
+      else{const ks=+o.dataset.ks;html=`<span>סה"כ ${money(pr,2)} למזומן: חלק הילד/ה ${money(pr*ks,2)}, חלק ההורים ${money(pr*(1-ks),2)}</span>${taxLine}`;}}}
+    pv.innerHTML=html||'—';el('msave').disabled=!ok;
+  }
+  f.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
+  if(el('msym'))el('msym').onchange=fillSym;
+  f.onsubmit=async e=>{
+    e.preventDefault();const date=el('mdate').value||today(),note=el('mnote').value.trim();let tx={id:uid(),type:mode,kid,date,note,createdAt:nowISO()};
+    if(mode==='withdraw'||mode==='parentback'){tx.amount=+(+el('mamt').value).toFixed(2);}
+    else if(mode==='dividend'){const o=opt();if(!o)return;tx.symbol=o.value;tx.amount=+(+el('mamt').value).toFixed(2);}
+    else{const o=opt();if(!o)return;const cur=o.dataset.cur,u=+el('munits').value,price=+el('mprice').value,fx=cur==='USD'?(+el('mfx').value||usdNow()):1;
+      Object.assign(tx,{symbol:o.value,units:u,price,currency:cur,fx,proceeds:+toILS(u*price,cur,fx).toFixed(2)});}
+    el('msave').disabled=true;
+    const ok=await save(n=>{n.tx.push(tx);if(tx.price&&tx.symbol){n.hist[tx.symbol]=n.hist[tx.symbol]||{};if(!n.hist[tx.symbol][date])n.hist[tx.symbol][date]=tx.price;}},'נשמר');
+    if(!ok)el('msave').disabled=false;
+  };
+  if(el('msym'))fillSym();else calc();
+}
+function bindPrices(f){
+  f.onsubmit=async e=>{
+    e.preventDefault();const fx=+$('#fxin').value;if(!(fx>2&&fx<6)){toast('שער לא סביר');return;}
+    const upd=[];f.querySelectorAll('input[data-sym]').forEach(i=>{const v=+i.value;if(v>0)upd.push([i.dataset.sym,v]);});
+    const d=today(),iso=nowISO(),syms=knownSymbols();$('#psave').disabled=true;
+    const ok=await save(n=>{
+      if(Math.abs(fx-usdNow())>1e-9){n.config.usdils=fx;n.config.fxAsOf=iso;n.config.fxSource='manual';n.fxHist[d]=fx;}
+      for(const [s,v] of upd){const p=n.prices[s];if(p&&+p.price===v)continue;
+        n.prices[s]={...(p||{symbol:s,name:syms[s]?.name||'',assetType:syms[s]?.type||'index',currency:syms[s]?.currency||'USD'}),price:v,updatedAt:iso,source:'manual',asOf:d};
+        n.hist[s]=n.hist[s]||{};n.hist[s][d]=v;}
+    },'המחירים נשמרו');
+    if(!ok)$('#psave').disabled=false;
+  };
+}
+function bindMisc(){
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{document.querySelector(`[data-confirm="${CSS.escape(b.dataset.del)}"]`).hidden=false;});
+  document.querySelectorAll('[data-delno]').forEach(b=>b.onclick=()=>{document.querySelector(`[data-confirm="${CSS.escape(b.dataset.delno)}"]`).hidden=true;});
+  document.querySelectorAll('[data-delyes]').forEach(b=>b.onclick=()=>{b.disabled=true;const id=b.dataset.delyes;save(n=>{n.tx=n.tx.filter(t=>t.id!==id);},'נמחק').then(ok=>{if(!ok)b.disabled=false;});});
+  const sd=$('[data-saveday]');if(sd)sd.onclick=()=>{const v=Math.round(+$('#dday').value);if(!(v>=1&&v<=28)){toast('בחרו יום בין 1 ל-28');return;}save(n=>{n.config.depositDay=v;},'נשמר');};
+  const tx=$('[data-savetax]');if(tx)tx.onclick=()=>{const v=+$('#taxin').value;if(!(v>=0&&v<=60)){toast('שיעור לא תקין');return;}save(n=>{n.config.taxRate=+(v/100).toFixed(4);},'נשמר');};
+  const lk=$('#lockSel');if(lk)lk.onchange=()=>{ls.set('kidLock',lk.value||null);toast(lk.value?'המכשיר ננעל ל'+KIDS[lk.value].name:'הנעילה בוטלה');};
+  const sp=$('[data-savepin]');if(sp)sp.onclick=async()=>{const v=$('#newpin').value;if(!/^\d{4}$/.test(v)){toast('הקוד צריך 4 ספרות');return;}
+    let h;try{h=await sha(v);}catch(e){toast('הדפדפן לא תומך בהחלפת קוד');return;}save(n=>{n.config.pinHash=h;},'הקוד הוחלף');};
+}
+
+/* ===== PIN & picker ===== */
+async function pinOk(v){const h=ST.config.pinHash;if(!h)return v==='1981';try{return (await sha(v))===h;}catch(e){return false;}}
+function askPin(onOk){
+  let val='';const layer=$('#layer');
+  const close=()=>{layer.innerHTML='';document.removeEventListener('keydown',key);};
+  const draw=shake=>{layer.innerHTML=`<div class="overlay" data-close><div class="sheet" role="dialog" aria-label="קוד הורה">
+    <h2 style="text-align:center">קוד הורה</h2><div class="dots ${shake?'shake':''}">${[0,1,2,3].map(i=>`<i class="${i<val.length?'f':''}"></i>`).join('')}</div>
+    <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')}<button data-k="x" aria-label="ביטול">✕</button><button data-k="0">0</button><button data-k="b" aria-label="מחיקה">⌫</button></div></div></div>`;
+    layer.querySelectorAll('[data-k]').forEach(b=>b.onclick=e=>{e.stopPropagation();press(b.dataset.k);});
+    layer.querySelector('[data-close]').onclick=e=>{if(e.target.hasAttribute('data-close'))close();};};
+  let busy=false;
+  const press=async k=>{if(busy)return;if(k==='x')return close();if(k==='b')val=val.slice(0,-1);else if(val.length<4)val+=k;
+    if(val.length===4){busy=true;const good=await pinOk(val);busy=false;if(good){close();onOk();return;}val='';draw(true);return;}draw(false);};
+  const key=e=>{if(/^\d$/.test(e.key))press(e.key);else if(e.key==='Backspace')press('b');else if(e.key==='Escape')close();};
+  document.addEventListener('keydown',key);draw(false);
+}
+function openPicker(k){
+  const layer=$('#layer'),p=kidProfile(k);let emoji=p.emoji,color=p.color;
+  const draw=()=>{layer.innerHTML=`<div class="overlay" data-close><div class="sheet" style="--kid:${color}">
+    <h2>${G(k,'בחרי','בחר')} דמות</h2><div class="picker">${ANIMALS.map(a=>`<button data-a="${a}" aria-pressed="${a===emoji}">${a}</button>`).join('')}</div>
+    <h2>${G(k,'בחרי','בחר')} צבע</h2><div class="picker">${COLORS.map(c=>`<button class="swatch" data-c="${c}" aria-pressed="${c===color}" style="background:${c}" aria-label="צבע"></button>`).join('')}</div>
+    <div class="row"><button class="btn" data-ok style="background:${color};color:#fff">שמירה</button><button class="btn ghost" data-cancel>ביטול</button></div></div></div>`;
+    layer.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{emoji=b.dataset.a;draw();});
+    layer.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{color=b.dataset.c;draw();});
+    layer.querySelector('[data-cancel]').onclick=()=>{layer.innerHTML='';};
+    layer.querySelector('[data-close]').onclick=e=>{if(e.target.hasAttribute('data-close'))layer.innerHTML='';};
+    layer.querySelector('[data-ok]').onclick=()=>{ls.set('kidProfile:'+k,JSON.stringify({emoji,color}));layer.innerHTML='';render();};};
+  draw();
+}
+
+/* ===== boot ===== */
+function loadPublic(first){
+  return fetch('data.json?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(d=>{ST=normalize(d);if(first||U.view!=='parent')render();})
+    .catch(()=>{if(first)$('#app').innerHTML='<p class="notice" style="margin-top:40px">לא הצלחתי לטעון את הקופה. בדקו את החיבור לאינטרנט ונסו שוב.</p>';});
+}
+if(PUBLIC){
+  loadPublic(true);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('#layer').innerHTML)loadPublic(false);});
+  return;
+}
+render();
+(async()=>{
+  let a=null;try{a=window.claude&&window.claude.use?await window.claude.use('artifact'):null;}catch(e){a=null;}
+  U.A=a;U.aReady=true;const w=$('#wnotice');if(w)w.innerHTML=writeNotice();
+})();
+})();
+</script>
+
+</body></html>
